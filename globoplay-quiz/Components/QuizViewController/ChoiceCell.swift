@@ -11,6 +11,10 @@ import UIKit
 
 final class ChoiceCell: UICollectionViewCell {
     
+    static var identifier: String {
+        return String(describing: self)
+    }
+    
     enum State {
         case unselected
         case correct
@@ -19,14 +23,33 @@ final class ChoiceCell: UICollectionViewCell {
         case wrongNotSelected
     }
     
+    private let containerView: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.white
+        v.layer.cornerRadius = 4
+        return v
+    }()
+    
     private let label: UILabel = {
         let lbl = UILabel()
         lbl.numberOfLines = 1
+        lbl.textAlignment = .center
+        lbl.font = UIFont.boldSystemFont(ofSize: 16)
         return lbl
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        contentView.addSubview(containerView)
+        containerView.addSubview(label)
+        
+        containerView.anchor(top: contentView.topAnchor,
+                             leading: contentView.leadingAnchor,
+                             bottom: contentView.bottomAnchor,
+                             trailing: contentView.trailingAnchor,
+                             insets: .init(top: 0, left: 14, bottom: 0, right: 14))
+        label.fillSuperview()
     }
     
     required init?(coder: NSCoder) {
@@ -36,39 +59,40 @@ final class ChoiceCell: UICollectionViewCell {
     func setup(text: String, state: ChoiceCell.State) {
         label.text = text
         
-        let color: UIColor
         let textColor: UIColor
+        let color: UIColor
         let borderWidth: CGFloat
         let borderColor: UIColor?
         switch state {
         case .unselected:
-            color = .white
-            textColor = .black
+            textColor = Color.black
+            color = Color.white
             borderWidth = 0
             borderColor = nil
         case .correct:
-            color = .green
-            textColor = .white
+            textColor = Color.white
+            color = Color.green
             borderWidth = 0
             borderColor = nil
         case .correctNotSelected:
+            textColor = Color.green
             color = .clear
-            textColor = .green
             borderWidth = 2
-            borderColor = .green
+            borderColor = Color.green
         case .wrong:
-            color = .red
-            textColor = .white
+            textColor = Color.white
+            color = Color.red
             borderWidth = 0
             borderColor = nil
         case .wrongNotSelected:
+            textColor = Color.lightGray
             color = .clear
-            textColor = .lightGray
             borderWidth = 2
-            borderColor = .lightGray
+            borderColor = Color.lightGray
         }
-        contentView.backgroundColor = color
-        contentView.layer.borderWidth = borderWidth
-        contentView.layer.borderColor = borderColor?.cgColor
+        label.textColor = textColor
+        containerView.backgroundColor = color
+        containerView.layer.borderWidth = borderWidth
+        containerView.layer.borderColor = borderColor?.cgColor
     }
 }

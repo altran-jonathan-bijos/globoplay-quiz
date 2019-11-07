@@ -6,10 +6,10 @@
 //  Copyright © 2019 Globo. All rights reserved.
 //
 
-struct Quiz {
-    let questions: [Question]
+enum Quiz {
+    static var questions: [Question] = []
     
-    func random(total: Int = 10) -> [Question] {
+    static func random(total: Int = 10) -> [Question] {
         return Array(questions.shuffled()[0..<total])
     }
 }

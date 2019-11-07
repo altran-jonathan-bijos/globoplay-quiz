@@ -88,7 +88,6 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
-
 				F45BC15623749C7A00665F73 /* Components */,
 				ED5732182374A4C500C5D36E /* Utils */,
 				F45BC1532374815000665F73 /* Quiz */,
