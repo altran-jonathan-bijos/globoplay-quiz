@@ -19,6 +19,7 @@ final class HeaderView: UICollectionReusableView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.backgroundColor = UIColor(hex: 0xFF8983)
         self.addSubview(label)
         label.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
         label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
