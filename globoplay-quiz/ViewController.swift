@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    let webservice = QuizWebservice()
+    
     private let container: UIView = {
         let v = UIButton()
         v.translatesAutoresizingMaskIntoConstraints = false
@@ -21,6 +23,15 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
+        
+        webservice.getQuestions { (result) in
+            switch result {
+            case .success(let questions):
+                print(questions)
+            case .failure(let err):
+                print(err)
+            }
+        }
     }
     
     private func setupViews() {
