@@ -24,6 +24,7 @@
 		F45BC1502374752000665F73 /* Choice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC14F2374752000665F73 /* Choice.swift */; };
 		F45BC1522374758400665F73 /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC1512374758400665F73 /* Question.swift */; };
 		F45BC1552374815B00665F73 /* Quiz.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC1542374815B00665F73 /* Quiz.swift */; };
+		F45BC15A23749CF600665F73 /* ChoiceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC15923749CF600665F73 /* ChoiceCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		F45BC14F2374752000665F73 /* Choice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Choice.swift; sourceTree = "<group>"; };
 		F45BC1512374758400665F73 /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question.swift; sourceTree = "<group>"; };
 		F45BC1542374815B00665F73 /* Quiz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quiz.swift; sourceTree = "<group>"; };
+		F45BC15923749CF600665F73 /* ChoiceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChoiceCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,8 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
+
+				F45BC15623749C7A00665F73 /* Components */,
 				ED5732182374A4C500C5D36E /* Utils */,
 				F45BC1532374815000665F73 /* Quiz */,
 				F45BC14E237473CE00665F73 /* Models */,
@@ -130,6 +134,22 @@
 				F45BC1542374815B00665F73 /* Quiz.swift */,
 			);
 			path = Quiz;
+			sourceTree = "<group>";
+		};
+		F45BC15623749C7A00665F73 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				F45BC15823749CD900665F73 /* QuizViewController */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		F45BC15823749CD900665F73 /* QuizViewController */ = {
+			isa = PBXGroup;
+			children = (
+				F45BC15923749CF600665F73 /* ChoiceCell.swift */,
+			);
+			path = QuizViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -217,6 +237,7 @@
 				ED5732152374818300C5D36E /* HeaderView.swift in Sources */,
 				ED573217237485D500C5D36E /* UIColor+Extension.swift in Sources */,
 				F45BC1492374730E00665F73 /* QuizWebservice.swift in Sources */,
+				F45BC15A23749CF600665F73 /* ChoiceCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
