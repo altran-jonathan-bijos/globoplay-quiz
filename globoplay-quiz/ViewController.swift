@@ -17,7 +17,7 @@ final class ViewController: UIViewController {
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .red
+        cv.backgroundColor = .white
         return cv
     }()
 
@@ -29,7 +29,7 @@ final class ViewController: UIViewController {
     
     private func setupViews() {
         collectionView.register(Cell.self, forCellWithReuseIdentifier: Cell.identifier)
-        collectionView.register(Header.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Header.identifier)
+        collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
         self.view.addSubview(collectionView)
     }
  
@@ -60,8 +60,9 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
         case UICollectionView.elementKindSectionHeader:
             let header = collectionView.dequeueReusableSupplementaryView(
                 ofKind: UICollectionView.elementKindSectionHeader,
-                withReuseIdentifier: Header.identifier,
-                for: indexPath) as! Header
+                withReuseIdentifier: HeaderView.identifier,
+                for: indexPath) as! HeaderView
+            
             header.setup("Ola?")
             return header
         default:
@@ -70,34 +71,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        return CGSize(width: self.view.frame.width, height: 100)
-    }
-}
-
-final class Header: UICollectionReusableView {
-    
-    static let identifier: String = "Header"
-    private let label: UILabel = {
-        let l = UILabel()
-        l.translatesAutoresizingMaskIntoConstraints = false
-        return l
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.addSubview(label)
-        label.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
-        label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
-        label.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
-        label.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setup(_ desc: String) {
-        label.text = desc
+        return CGSize(width: self.view.frame.width, height: self.view.frame.height * 0.27)
     }
 }
 
