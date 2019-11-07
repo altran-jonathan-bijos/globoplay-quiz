@@ -27,13 +27,13 @@ final class HeaderView: UICollectionReusableView {
         let imageView = UIImageView(image: UIImage(named: "header-wave"))
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleToFill
-        imageView.backgroundColor = Color.grayBrackground
+        imageView.backgroundColor = Color.darkGray
         return imageView
     }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.backgroundColor = Color.blackQuiz
+        self.backgroundColor = Color.black
         self.addSubview(label)
         self.addSubview(quizImageView)
         self.setupAnchor()

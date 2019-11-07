@@ -19,7 +19,7 @@ final class ViewController: UIViewController {
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = Color.grayBrackground
+        cv.backgroundColor = Color.darkGray
         return cv
     }()
 
