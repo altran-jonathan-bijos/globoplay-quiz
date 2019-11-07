@@ -32,6 +32,25 @@ class ViewController: UIViewController {
                 print(err)
             }
         }
+        
+        let questions = [
+            Question(id: "1", description: "", correctAnswer: "", choices: [Choice(id: "10", answer: "")]),
+            Question(id: "2", description: "", correctAnswer: "", choices: [Choice(id: "20", answer: "")]),
+            Question(id: "3", description: "", correctAnswer: "", choices: [Choice(id: "30", answer: "")]),
+            Question(id: "4", description: "", correctAnswer: "", choices: [Choice(id: "40", answer: "")]),
+            Question(id: "5", description: "", correctAnswer: "", choices: [Choice(id: "50", answer: "")]),
+            Question(id: "6", description: "", correctAnswer: "", choices: [Choice(id: "60", answer: "")]),
+            Question(id: "7", description: "", correctAnswer: "", choices: [Choice(id: "70", answer: "")]),
+        ]
+        let quiz = Quiz(questions: questions)
+        
+        print(quiz.questions)
+        print(quiz.questions.count)
+        print("-----------------------------------")
+        
+        let total = quiz.random(total: 3)
+        print(total)
+        print(total.count)
     }
     
     private func setupViews() {

@@ -19,6 +19,7 @@
 		F45BC14D2374736A00665F73 /* BaseWebservice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC14C2374736A00665F73 /* BaseWebservice.swift */; };
 		F45BC1502374752000665F73 /* Choice.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC14F2374752000665F73 /* Choice.swift */; };
 		F45BC1522374758400665F73 /* Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC1512374758400665F73 /* Question.swift */; };
+		F45BC1552374815B00665F73 /* Quiz.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC1542374815B00665F73 /* Quiz.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		F45BC14C2374736A00665F73 /* BaseWebservice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseWebservice.swift; sourceTree = "<group>"; };
 		F45BC14F2374752000665F73 /* Choice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Choice.swift; sourceTree = "<group>"; };
 		F45BC1512374758400665F73 /* Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Question.swift; sourceTree = "<group>"; };
+		F45BC1542374815B00665F73 /* Quiz.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quiz.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
+				F45BC1532374815000665F73 /* Quiz */,
 				F45BC14E237473CE00665F73 /* Models */,
 				F45BC141237470F600665F73 /* Networking */,
 				F45BC12D2374697D00665F73 /* AppDelegate.swift */,
@@ -99,6 +102,14 @@
 				F45BC14F2374752000665F73 /* Choice.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		F45BC1532374815000665F73 /* Quiz */ = {
+			isa = PBXGroup;
+			children = (
+				F45BC1542374815B00665F73 /* Quiz.swift */,
+			);
+			path = Quiz;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -178,6 +189,7 @@
 				F45BC1432374712B00665F73 /* Request.swift in Sources */,
 				F45BC1522374758400665F73 /* Question.swift in Sources */,
 				F45BC1452374716C00665F73 /* Endpoints.swift in Sources */,
+				F45BC1552374815B00665F73 /* Quiz.swift in Sources */,
 				F45BC147237472E900665F73 /* ApiError.swift in Sources */,
 				F45BC12E2374697D00665F73 /* AppDelegate.swift in Sources */,
 				F45BC1492374730E00665F73 /* QuizWebservice.swift in Sources */,
