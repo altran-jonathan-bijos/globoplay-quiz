@@ -11,6 +11,7 @@
 		ED5732152374818300C5D36E /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5732142374818300C5D36E /* HeaderView.swift */; };
 		ED573217237485D500C5D36E /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED573216237485D500C5D36E /* UIColor+Extension.swift */; };
 		ED57321A2374A4D900C5D36E /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED5732192374A4D900C5D36E /* Color.swift */; };
+		ED57321D2374AA0C00C5D36E /* FooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED57321C2374AA0C00C5D36E /* FooterView.swift */; };
 		F45BC12E2374697D00665F73 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC12D2374697D00665F73 /* AppDelegate.swift */; };
 		F45BC1322374697D00665F73 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45BC1312374697D00665F73 /* ViewController.swift */; };
 		F45BC1372374698000665F73 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F45BC1362374698000665F73 /* Assets.xcassets */; };
@@ -32,6 +33,7 @@
 		ED5732142374818300C5D36E /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		ED573216237485D500C5D36E /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		ED5732192374A4D900C5D36E /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
+		ED57321C2374AA0C00C5D36E /* FooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FooterView.swift; sourceTree = "<group>"; };
 		F45BC12A2374697D00665F73 /* globoplay-quiz.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "globoplay-quiz.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F45BC12D2374697D00665F73 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F45BC1312374697D00665F73 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -69,6 +71,23 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		ED57321B2374A98300C5D36E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED573216237485D500C5D36E /* UIColor+Extension.swift */,
+				ED57321223747E6300C5D36E /* UIView+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ED57321E2374AB8300C5D36E /* FooterView */ = {
+			isa = PBXGroup;
+			children = (
+				ED57321C2374AA0C00C5D36E /* FooterView.swift */,
+			);
+			path = FooterView;
+			sourceTree = "<group>";
+		};
 		F45BC1212374697D00665F73 = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +107,7 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
+				ED57321B2374A98300C5D36E /* Extensions */,
 				F45BC15623749C7A00665F73 /* Components */,
 				ED5732182374A4C500C5D36E /* Utils */,
 				F45BC1532374815000665F73 /* Quiz */,
@@ -95,12 +115,9 @@
 				F45BC141237470F600665F73 /* Networking */,
 				F45BC12D2374697D00665F73 /* AppDelegate.swift */,
 				F45BC1312374697D00665F73 /* ViewController.swift */,
-				ED5732142374818300C5D36E /* HeaderView.swift */,
 				F45BC1362374698000665F73 /* Assets.xcassets */,
 				F45BC1382374698000665F73 /* LaunchScreen.storyboard */,
 				F45BC13B2374698000665F73 /* Info.plist */,
-				ED57321223747E6300C5D36E /* UIView+Extension.swift */,
-				ED573216237485D500C5D36E /* UIColor+Extension.swift */,
 			);
 			path = "globoplay-quiz";
 			sourceTree = "<group>";
@@ -138,6 +155,7 @@
 		F45BC15623749C7A00665F73 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				ED57321E2374AB8300C5D36E /* FooterView */,
 				F45BC15823749CD900665F73 /* QuizViewController */,
 			);
 			path = Components;
@@ -146,6 +164,7 @@
 		F45BC15823749CD900665F73 /* QuizViewController */ = {
 			isa = PBXGroup;
 			children = (
+				ED5732142374818300C5D36E /* HeaderView.swift */,
 				F45BC15923749CF600665F73 /* ChoiceCell.swift */,
 			);
 			path = QuizViewController;
@@ -237,6 +256,7 @@
 				ED573217237485D500C5D36E /* UIColor+Extension.swift in Sources */,
 				F45BC1492374730E00665F73 /* QuizWebservice.swift in Sources */,
 				F45BC15A23749CF600665F73 /* ChoiceCell.swift in Sources */,
+				ED57321D2374AA0C00C5D36E /* FooterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

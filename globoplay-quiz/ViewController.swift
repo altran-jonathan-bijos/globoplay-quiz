@@ -32,12 +32,18 @@ final class ViewController: UIViewController {
         flowLayout.minimumLineSpacing = 30
         flowLayout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-//        cv.contentInset = .init(top: 0, left: 14, bottom: 0, right: 14)
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = Color.darkGray
         return cv
+    }()
+    
+    private let footerView: UIView = {
+        let f = FooterView()
+        f.translatesAutoresizingMaskIntoConstraints = false
+        f.backgroundColor = Color.darkGray
+        return f
     }()
 
     
@@ -73,13 +79,21 @@ final class ViewController: UIViewController {
     
     private func setupViews() {
         view.addSubview(collectionView)
+        self.view.addSubview(footerView)
     }
  
     private func setupConstraints() {
+        // MARK: - CollectionView Anchor
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        // MARK: - FooterView Anchor
+        footerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        footerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        footerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        footerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.09375).isActive = true
     }
     
     private func getQuestions() {
