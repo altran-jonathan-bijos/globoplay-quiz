@@ -28,6 +28,8 @@ final class ViewController: UIViewController {
     }
     
     private func setupViews() {
+        collectionView.register(Cell.self, forCellWithReuseIdentifier: Cell.identifier)
+        collectionView.register(Header.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Header.identifier)
         self.view.addSubview(collectionView)
     }
  
@@ -45,7 +47,7 @@ extension ViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return UICollectionViewCell()
+        return collectionView.dequeueReusableCell(withReuseIdentifier: Cell.identifier, for: indexPath)
     }
     
     
@@ -56,28 +58,51 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Header.identifier, for: indexPath) as! Header
-            
+            let header = collectionView.dequeueReusableSupplementaryView(
+                ofKind: UICollectionView.elementKindSectionHeader,
+                withReuseIdentifier: Header.identifier,
+                for: indexPath) as! Header
+            header.setup("Ola?")
             return header
         default:
             return UICollectionReusableView()
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: self.view.frame.width, height: 100)
     }
 }
 
 final class Header: UICollectionReusableView {
     
     static let identifier: String = "Header"
+    private let label: UILabel = {
+        let l = UILabel()
+        l.translatesAutoresizingMaskIntoConstraints = false
+        return l
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        self.addSubview(label)
+        label.topAnchor.constraint(equalTo: self.topAnchor, constant: 8).isActive = true
+        label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
+        label.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
+        label.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setup() {
-        return 
+    func setup(_ desc: String) {
+        label.text = desc
+    }
+}
+
+final class Cell: UICollectionViewCell {
+    static var identifier: String {
+        return String(describing: self)
     }
 }
