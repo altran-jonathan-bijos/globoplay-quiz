@@ -69,6 +69,15 @@
 			path = Utils;
 			sourceTree = "<group>";
 		};
+		ED57321B2374A98300C5D36E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED573216237485D500C5D36E /* UIColor+Extension.swift */,
+				ED57321223747E6300C5D36E /* UIView+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		F45BC1212374697D00665F73 = {
 			isa = PBXGroup;
 			children = (
@@ -88,6 +97,7 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
+				ED57321B2374A98300C5D36E /* Extensions */,
 				F45BC15623749C7A00665F73 /* Components */,
 				ED5732182374A4C500C5D36E /* Utils */,
 				F45BC1532374815000665F73 /* Quiz */,
@@ -98,8 +108,6 @@
 				F45BC1362374698000665F73 /* Assets.xcassets */,
 				F45BC1382374698000665F73 /* LaunchScreen.storyboard */,
 				F45BC13B2374698000665F73 /* Info.plist */,
-				ED57321223747E6300C5D36E /* UIView+Extension.swift */,
-				ED573216237485D500C5D36E /* UIColor+Extension.swift */,
 			);
 			path = "globoplay-quiz";
 			sourceTree = "<group>";
