@@ -19,7 +19,7 @@ final class ViewController: UIViewController {
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.backgroundColor = .white
+        cv.backgroundColor = Color.grayBrackground
         return cv
     }()
 
@@ -27,7 +27,6 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
-        
         webservice.getQuestions { (result) in
             switch result {
             case .success(let questions):
@@ -93,7 +92,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
                 withReuseIdentifier: HeaderView.identifier,
                 for: indexPath) as! HeaderView
             
-            header.setup("Ola?")
+            header.setup("Qual o personagem do X-MAN que anda de cadeira de rodas?")
             return header
         default:
             return UICollectionReusableView()
