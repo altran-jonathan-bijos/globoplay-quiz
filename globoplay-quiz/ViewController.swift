@@ -22,6 +22,13 @@ final class ViewController: UIViewController {
         cv.backgroundColor = Color.darkGray
         return cv
     }()
+    
+    private let footerView: UIView = {
+        let f = FooterView()
+        f.translatesAutoresizingMaskIntoConstraints = false
+        f.backgroundColor = Color.darkGray
+        return f
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,13 +50,21 @@ final class ViewController: UIViewController {
         collectionView.register(Cell.self, forCellWithReuseIdentifier: Cell.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
         self.view.addSubview(collectionView)
+        self.view.addSubview(footerView)
     }
  
     private func setupConstraints() {
+        // MARK: - CollectionView Anchor
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        // MARK: - FooterView Anchor
+        footerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        footerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        footerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        footerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.09375).isActive = true
     }
 }
 

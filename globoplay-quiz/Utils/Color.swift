@@ -9,7 +9,7 @@
 import UIKit
 
 enum Color {
-    static let darkGray = UIColor(hex: 0x888888)
+    static let darkGray = UIColor(hex: 0x454545)
     static let lightGray = UIColor(hex: 0xE5E5E5)
     static let white = UIColor.white
     static let green = UIColor(hex: 0x63C600)
