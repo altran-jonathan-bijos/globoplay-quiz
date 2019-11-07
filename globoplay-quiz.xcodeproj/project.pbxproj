@@ -88,7 +88,6 @@
 		F45BC12C2374697D00665F73 /* globoplay-quiz */ = {
 			isa = PBXGroup;
 			children = (
-
 				F45BC15623749C7A00665F73 /* Components */,
 				ED5732182374A4C500C5D36E /* Utils */,
 				F45BC1532374815000665F73 /* Quiz */,
@@ -96,7 +95,6 @@
 				F45BC141237470F600665F73 /* Networking */,
 				F45BC12D2374697D00665F73 /* AppDelegate.swift */,
 				F45BC1312374697D00665F73 /* ViewController.swift */,
-				ED5732142374818300C5D36E /* HeaderView.swift */,
 				F45BC1362374698000665F73 /* Assets.xcassets */,
 				F45BC1382374698000665F73 /* LaunchScreen.storyboard */,
 				F45BC13B2374698000665F73 /* Info.plist */,
@@ -147,6 +145,7 @@
 		F45BC15823749CD900665F73 /* QuizViewController */ = {
 			isa = PBXGroup;
 			children = (
+				ED5732142374818300C5D36E /* HeaderView.swift */,
 				F45BC15923749CF600665F73 /* ChoiceCell.swift */,
 			);
 			path = QuizViewController;
