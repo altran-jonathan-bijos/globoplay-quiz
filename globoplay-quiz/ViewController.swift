@@ -118,15 +118,14 @@ final class ViewController: UIViewController {
         state = .loading
         webservice.getQuestions { [weak self] (result) in
             guard let self = self else { return }
-            self.state = .error
-//            switch result {
-//            case .success(let questions):
-//                self.state = .loaded
-//                Quiz.questions = questions
-//                self.questions = Quiz.random(total: 3)
-//            case .failure:
-//                self.state = .error
-//            }
+            switch result {
+            case .success(let questions):
+                self.state = .loaded
+                Quiz.questions = questions
+                self.questions = Quiz.random(total: 3)
+            case .failure:
+                self.state = .error
+            }
         }
     }
 }
