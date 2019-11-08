@@ -118,14 +118,15 @@ final class ViewController: UIViewController {
         state = .loading
         webservice.getQuestions { [weak self] (result) in
             guard let self = self else { return }
-            switch result {
-            case .success(let questions):
-                self.state = .loaded
-                Quiz.questions = questions
-                self.questions = Quiz.random(total: 3)
-            case .failure:
-                self.state = .error
-            }
+            self.state = .error
+//            switch result {
+//            case .success(let questions):
+//                self.state = .loaded
+//                Quiz.questions = questions
+//                self.questions = Quiz.random(total: 3)
+//            case .failure:
+//                self.state = .error
+//            }
         }
     }
 }
@@ -152,6 +153,8 @@ extension ViewController: UICollectionViewDataSource {
         let cellState: ChoiceCell.State
         if state == .loading {
             cellState = .loading
+        } else if state == .error {
+            cellState = .error
         } else {
             guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
             let question = questions[selectedQuestionIndex]
@@ -177,7 +180,12 @@ extension ViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 45)
+        switch state {
+        case .loaded, .loading:
+            return CGSize(width: view.frame.width, height: 45)
+        case .error:
+            return CGSize(width: view.frame.width, height: view.frame.height * contentViewHeightMultipler)
+        }
     }
 }
 
