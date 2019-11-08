@@ -132,35 +132,46 @@ final class ViewController: UIViewController {
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let selectedQuestionIndex = selectedQuestionIndex else {
-            return 0
+        switch state {
+        case .loaded:
+            guard let selectedQuestionIndex = selectedQuestionIndex else {
+                return 0
+            }
+            let question = questions[selectedQuestionIndex]
+            return question.choices.count
+        case .loading:
+            return 4
+        case .error:
+            return 1
         }
-        let question = questions[selectedQuestionIndex]
-        return question.choices.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
-        let question = questions[selectedQuestionIndex]
-        let choice = question.choices[indexPath.item]
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChoiceCell.identifier, for: indexPath) as! ChoiceCell
         
         let cellState: ChoiceCell.State
-        if let selectedChoiceIndex = selectedChoiceIndex {
-            let isCorrect = question.correctAnswer == choice.id
-            let isSelectedCell = indexPath.item == selectedChoiceIndex
-            
-            if isCorrect {
-                cellState = isSelectedCell ? .correct : .correctNotSelected
-            } else {
-                cellState = isSelectedCell ? .wrong : .wrongNotSelected
-            }
+        if state == .loading {
+            cellState = .loading
         } else {
-            cellState = .unselected
+            guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
+            let question = questions[selectedQuestionIndex]
+            let choice = question.choices[indexPath.item]
+            
+            if let selectedChoiceIndex = selectedChoiceIndex {
+                let isCorrect = question.correctAnswer == choice.id
+                let isSelectedCell = indexPath.item == selectedChoiceIndex
+                
+                if isCorrect {
+                    cellState = isSelectedCell ? .correct(text: choice.answer) : .correctNotSelected(text: choice.answer)
+                } else {
+                    cellState = isSelectedCell ? .wrong(text: choice.answer) : .wrongNotSelected(text: choice.answer)
+                }
+            } else {
+                cellState = .unselected(text: choice.answer)
+            }
         }
         
-        cell.setup(text: choice.answer, state: cellState)
+        cell.setup(state: cellState)
         
         return cell
     }
@@ -198,13 +209,15 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
             case .loaded:
                 if let selectedQuestionIndex = selectedQuestionIndex {
                     let question = questions[selectedQuestionIndex]
-                    header.setup(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                    let state: HeaderView.State = .error(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                    header.setup(state: state)
                 }
             case .loading:
-                break
+                header.setup(state: .loading)
             case .error:
+                let state: HeaderView.State = .error(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
                 (footerView as? FooterView)?.setupButton(state: .tryAgain)
-                header.setup(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
+                header.setup(state: state)
             }
             
             return header
