@@ -21,13 +21,6 @@ final class ViewController: UIViewController {
     
     private var state: State = .loading {
         didSet {
-//            switch state {
-//            case .loaded:
-//
-//            case .loading:
-//
-//            case .error:
-//            }
             collectionView.reloadData()
             collectionView.collectionViewLayout.invalidateLayout()
         }
@@ -202,9 +195,11 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
-                                                                         withReuseIdentifier: HeaderView.identifier,
-                                                                         for: indexPath) as! HeaderView
+            let header = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: UICollectionView.elementKindSectionHeader,
+                    withReuseIdentifier: HeaderView.identifier,
+                    for: indexPath
+                ) as! HeaderView
             
             switch state {
             case .loaded:
@@ -215,9 +210,9 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
             case .loading:
                 break
             case .error:
+                (footerView as? FooterView)?.setupButton(state: .tryAgain)
                 header.setup(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
             }
-            
             
             return header
         default:
