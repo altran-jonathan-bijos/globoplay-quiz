@@ -10,18 +10,41 @@ import UIKit
 
 final class ViewController: UIViewController {
     
+    private enum State {
+        case loaded
+        case loading
+        case error
+    }
+    
     
     // MARK: - Private properties
     
+    private var state: State = .loading {
+        didSet {
+//            switch state {
+//            case .loaded:
+//
+//            case .loading:
+//
+//            case .error:
+//            }
+            collectionView.reloadData()
+            collectionView.collectionViewLayout.invalidateLayout()
+        }
+    }
     private let webservice = QuizWebservice()
     private var selectedQuestionIndex: Int?
     private var selectedChoiceIndex: Int?
     private var selectedChoiceId: String?
     private var questions: [Question] = [] {
         didSet {
-            self.collectionView.reloadData()
             selectedQuestionIndex = questions.count > 0 ? 0 : nil
         }
+    }
+    private let headerViewHeightMultiplier: CGFloat = 0.3873239437
+    private let footerViewHeightMultiplier: CGFloat = 0.09375
+    private var contentViewHeightMultipler: CGFloat {
+        return 1.0 - headerViewHeightMultiplier - footerViewHeightMultiplier
     }
 
     
@@ -29,9 +52,10 @@ final class ViewController: UIViewController {
     
     private lazy var collectionView: UICollectionView = {
         let flowLayout = UICollectionViewFlowLayout()
-        flowLayout.minimumLineSpacing = 30
+        flowLayout.minimumLineSpacing = 24
         flowLayout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        cv.contentInset = .init(top: 0, left: 0, bottom: self.view.frame.height * self.footerViewHeightMultiplier, right: 0)
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
@@ -63,7 +87,7 @@ final class ViewController: UIViewController {
         selectedChoiceId = nil
         selectedQuestionIndex = nil
         selectedChoiceIndex = nil
-        collectionView.reloadData()
+        questions = []
         
         getQuestions()
     }
@@ -79,7 +103,7 @@ final class ViewController: UIViewController {
     
     private func setupViews() {
         view.addSubview(collectionView)
-        self.view.addSubview(footerView)
+        view.addSubview(footerView)
     }
  
     private func setupConstraints() {
@@ -90,21 +114,24 @@ final class ViewController: UIViewController {
         collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         
         // MARK: - FooterView Anchor
-        footerView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
-        footerView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
-        footerView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
-        footerView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.09375).isActive = true
+        footerView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        footerView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        footerView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        
+        footerView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: footerViewHeightMultiplier).isActive = true
     }
     
     private func getQuestions() {
+        state = .loading
         webservice.getQuestions { [weak self] (result) in
             guard let self = self else { return }
             switch result {
             case .success(let questions):
+                self.state = .loaded
                 Quiz.questions = questions
                 self.questions = Quiz.random(total: 3)
-            case .failure(let err):
-                print(err)
+            case .failure:
+                self.state = .error
             }
         }
     }
@@ -175,15 +202,23 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = collectionView.dequeueReusableSupplementaryView(
-                ofKind: UICollectionView.elementKindSectionHeader,
-                withReuseIdentifier: HeaderView.identifier,
-                for: indexPath) as! HeaderView
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
+                                                                         withReuseIdentifier: HeaderView.identifier,
+                                                                         for: indexPath) as! HeaderView
             
-            if let selectedQuestionIndex = selectedQuestionIndex {
-                let question = questions[selectedQuestionIndex]
-                header.setup(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+            switch state {
+            case .loaded:
+                if let selectedQuestionIndex = selectedQuestionIndex {
+                    let question = questions[selectedQuestionIndex]
+                    header.setup(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                }
+            case .loading:
+                break
+            case .error:
+                header.setup(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
             }
+            
+            
             return header
         default:
             return UICollectionReusableView()
@@ -191,8 +226,7 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-        let percent: CGFloat = 0.3873239437
-        return CGSize(width: self.view.frame.width, height: self.view.frame.height * percent)
+        return CGSize(width: self.view.frame.width, height: self.view.frame.height * headerViewHeightMultiplier)
     }
 }
 

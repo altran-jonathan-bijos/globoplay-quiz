@@ -10,7 +10,9 @@ import UIKit
 
 final class HeaderView: UICollectionReusableView {
     
-    static let identifier: String = "Header"
+    static var identifier: String {
+        return String(describing: self)
+    }
     
     private let titleLabel: UILabel = {
         let l = UILabel()
@@ -18,6 +20,11 @@ final class HeaderView: UICollectionReusableView {
         l.textAlignment = .center
         l.font = UIFont.boldSystemFont(ofSize: 26)
         l.textColor = .white
+        return l
+    }()
+    private let titleLabelSkeleton: UIView = {
+        let l = UILabel()
+        l.backgroundColor = Color.white
         return l
     }()
     
@@ -31,6 +38,16 @@ final class HeaderView: UICollectionReusableView {
         l.lineBreakMode = .byWordWrapping
         return l
     }()
+    private let descriptionLabelSkeleton: UIView = {
+        let l = UILabel()
+        l.backgroundColor = Color.white
+        return l
+    }()
+    private let descriptionLabel2Skeleton: UIView = {
+        let l = UILabel()
+        l.backgroundColor = Color.white
+        return l
+    }()
     
     private let quizImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "header-wave"))
@@ -38,6 +55,11 @@ final class HeaderView: UICollectionReusableView {
         imageView.contentMode = .scaleToFill
         imageView.backgroundColor = Color.darkGray
         return imageView
+    }()
+    private let quizImageViewSkeleton: UIView = {
+        let l = UILabel()
+        l.backgroundColor = Color.white
+        return l
     }()
     
     private let bottomSpacingView: UIView = {
@@ -60,12 +82,18 @@ final class HeaderView: UICollectionReusableView {
     func setupViews() {
         backgroundColor = Color.black
         addSubview(titleLabel)
+        addSubview(titleLabelSkeleton)
         addSubview(descriptionLabel)
+        addSubview(descriptionLabelSkeleton)
+        addSubview(descriptionLabel2Skeleton)
         addSubview(quizImageView)
         addSubview(bottomSpacingView)
     }
     
     private func setupAnchor() {
+        // MARK: Skeleton anchors
+        
+        
         // MARK: titleLabel anchor
         titleLabel.anchor(top: topAnchor,
                           leading: leadingAnchor,
