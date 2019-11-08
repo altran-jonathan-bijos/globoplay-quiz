@@ -210,12 +210,14 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
             case .loaded:
                 if let selectedQuestionIndex = selectedQuestionIndex {
                     let question = questions[selectedQuestionIndex]
-                    header.setup(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                    let state: HeaderView.State = .error(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                    header.setup(state: state)
                 }
             case .loading:
-                break
+                header.setup(state: .loading)
             case .error:
-                header.setup(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
+                let state: HeaderView.State = .error(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
+                header.setup(state: state)
             }
             
             

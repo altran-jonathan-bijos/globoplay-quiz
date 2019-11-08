@@ -10,9 +10,17 @@ import UIKit
 
 final class HeaderView: UICollectionReusableView {
     
+    enum State {
+        case loaded(title: String, description: String)
+        case loading
+        case error(title: String, description: String)
+    }
+    
     static var identifier: String {
         return String(describing: self)
     }
+    
+    // MARK: - Header Views
     
     private let titleLabel: UILabel = {
         let l = UILabel()
@@ -20,11 +28,6 @@ final class HeaderView: UICollectionReusableView {
         l.textAlignment = .center
         l.font = UIFont.boldSystemFont(ofSize: 26)
         l.textColor = .white
-        return l
-    }()
-    private let titleLabelSkeleton: UIView = {
-        let l = UILabel()
-        l.backgroundColor = Color.white
         return l
     }()
     
@@ -36,16 +39,6 @@ final class HeaderView: UICollectionReusableView {
         l.textColor = .white
         l.numberOfLines = 0
         l.lineBreakMode = .byWordWrapping
-        return l
-    }()
-    private let descriptionLabelSkeleton: UIView = {
-        let l = UILabel()
-        l.backgroundColor = Color.white
-        return l
-    }()
-    private let descriptionLabel2Skeleton: UIView = {
-        let l = UILabel()
-        l.backgroundColor = Color.white
         return l
     }()
     
@@ -68,6 +61,28 @@ final class HeaderView: UICollectionReusableView {
         return v
     }()
     
+    // MARK: - Skeleton views
+    
+    private let titleLabelSkeleton: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.white
+        v.layer.cornerRadius = 2
+        return v
+    }()
+    private let descriptionLabelSkeleton: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.white
+        v.layer.cornerRadius = 2
+        return v
+    }()
+    private let descriptionLabel2Skeleton: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.white
+        v.layer.cornerRadius = 2
+        return v
+    }()
+    
+    // MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -79,20 +94,32 @@ final class HeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupViews() {
-        backgroundColor = Color.black
-        
-        // Header subviews
-        addSubview(titleLabel)
-        addSubview(descriptionLabel)
-        addSubview(quizImageView)
-        addSubview(bottomSpacingView)
-        
-        // Skeleton subviews
-        addSubview(descriptionLabelSkeleton)
-        addSubview(descriptionLabel2Skeleton)
-        addSubview(titleLabelSkeleton)
+    // MARK: - Public functions
+    
+    func setup(state: State) {
+        switch state {
+        case .loaded(let title, let description):
+            titleLabel.text = title
+            descriptionLabel.text = description
+            setLabels(hidden: false)
+            setSkeletons(hidden: true)
+            shimmerSkeletons(false)
+        case .loading:
+            titleLabel.text = ""
+            descriptionLabel.text = ""
+            setLabels(hidden: true)
+            setSkeletons(hidden: false)
+            shimmerSkeletons(false)
+        case .error(let title, let description):
+            titleLabel.text = title
+            descriptionLabel.text = description
+            setLabels(hidden: false)
+            setSkeletons(hidden: true)
+            shimmerSkeletons(false)
+        }
     }
+    
+    // MARK: - Private functions
     
     private func setupAnchor() {
         // MARK: Header anchors
@@ -121,11 +148,55 @@ final class HeaderView: UICollectionReusableView {
         titleLabelSkeleton.anchorCenterXToSuperview()
         titleLabelSkeleton.anchor(top: topAnchor, insets: .init(top: 46, left: 0, bottom: 0, right: 0))
         
-//        descriptionLabelSkeleton.anchor(top: <#T##NSLayoutYAxisAnchor?#>, leading: <#T##NSLayoutXAxisAnchor?#>, bottom: <#T##NSLayoutYAxisAnchor?#>, trailing: <#T##NSLayoutXAxisAnchor?#>, insets: .init(top: 35, left: 16, bottom: 0, right: 16))
+        descriptionLabelSkeleton.anchor(height: 8)
+        descriptionLabelSkeleton.anchor(top: titleLabelSkeleton.bottomAnchor,
+                                        leading: leadingAnchor,
+                                        trailing: trailingAnchor,
+                                        insets: .init(top: 35, left: 16, bottom: 0, right: 16))
+        
+        descriptionLabel2Skeleton.anchor(height: 8)
+        descriptionLabel2Skeleton.anchor(top: descriptionLabelSkeleton.bottomAnchor,
+                                         leading: descriptionLabelSkeleton.leadingAnchor,
+                                         trailing: descriptionLabelSkeleton.trailingAnchor,
+                                         insets: .init(top: 12, left: 37, bottom: 0, right: 37))
+        
     }
     
-    func setup(title: String, description: String) {
-        titleLabel.text = title
-        descriptionLabel.text = description
+    private func setupViews() {
+        backgroundColor = Color.black
+        
+        // Header subviews
+        addSubview(titleLabel)
+        addSubview(descriptionLabel)
+        addSubview(quizImageView)
+        addSubview(bottomSpacingView)
+        
+        // Skeleton subviews
+        addSubview(titleLabelSkeleton)
+        addSubview(descriptionLabelSkeleton)
+        addSubview(descriptionLabel2Skeleton)
+    }
+    
+    private func setLabels(hidden: Bool) {
+        titleLabel.isHidden = hidden
+        descriptionLabel.isHidden = hidden
+    }
+    
+    private func setSkeletons(hidden: Bool) {
+        titleLabelSkeleton.isHidden = hidden
+        descriptionLabelSkeleton.isHidden = hidden
+        descriptionLabel2Skeleton.isHidden = hidden
+    }
+    
+    private func shimmerSkeletons(_ isShimmering: Bool) {
+        if isShimmering {
+            titleLabelSkeleton.startShimmering()
+            descriptionLabelSkeleton.startShimmering()
+            descriptionLabel2Skeleton.startShimmering()
+        } else {
+            titleLabelSkeleton.stopShimmering()
+            descriptionLabelSkeleton.stopShimmering()
+            descriptionLabel2Skeleton.stopShimmering()
+        }
     }
 }
