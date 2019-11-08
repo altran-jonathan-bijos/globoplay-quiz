@@ -152,17 +152,9 @@ extension ViewController: UICollectionViewDataSource {
             let isSelectedCell = indexPath.item == selectedChoiceIndex
             
             if isCorrect {
-                if isSelectedCell {
-                    cellState = .correct
-                } else {
-                    cellState = .correctNotSelected
-                }
+                cellState = isSelectedCell ? .correct : .correctNotSelected
             } else {
-                if isSelectedCell {
-                    cellState = .wrong
-                } else {
-                    cellState = .wrongNotSelected
-                }
+                cellState = isSelectedCell ? .wrong : .wrongNotSelected
             }
         } else {
             cellState = .unselected
@@ -185,6 +177,7 @@ extension ViewController: UICollectionViewDelegate {
         let choice = question.choices[indexPath.item]
         selectedChoiceIndex = indexPath.item
         selectedChoiceId = choice.id
+        (footerView as? FooterView)?.setupButton(state: .next)
         
         collectionView.reloadData()
     }

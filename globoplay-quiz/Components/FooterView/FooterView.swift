@@ -13,6 +13,7 @@ final class FooterView: UIView {
     enum State {
         case tryAgain
         case next
+        case hidden
     }
     
     private let footerImageView: UIImageView = {
@@ -38,7 +39,7 @@ final class FooterView: UIView {
         super.init(frame: frame)
         self.addSubview(footerImageView)
         self.addSubview(nextButton)
-        setupButton(state: .tryAgain)
+        self.setupButton(state: .hidden)
         self.setupAnchor()
     }
     
@@ -50,8 +51,12 @@ final class FooterView: UIView {
         switch state {
         case .next:
             nextButton.setTitle("Próximo", for: .normal)
+            nextButton.isHidden = false
+        case .hidden:
+            nextButton.isHidden = true
         case .tryAgain:
             nextButton.setTitle("Tentar Novamente", for: .normal)
+            nextButton.isHidden = false
         }
     }
     
