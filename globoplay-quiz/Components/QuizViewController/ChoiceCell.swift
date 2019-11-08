@@ -21,6 +21,7 @@ final class ChoiceCell: UICollectionViewCell {
         case correctNotSelected(text: String)
         case wrong(text: String)
         case wrongNotSelected(text: String)
+        case timerEndedAndNoneSelected(text: String)
         case loading
     }
     
@@ -114,6 +115,14 @@ final class ChoiceCell: UICollectionViewCell {
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .wrongNotSelected(let text):
+            label.text = text
+            label.textColor = Color.lightGray
+            color = .clear
+            borderWidth = 2
+            borderColor = Color.lightGray
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .timerEndedAndNoneSelected(let text):
             label.text = text
             label.textColor = Color.lightGray
             color = .clear

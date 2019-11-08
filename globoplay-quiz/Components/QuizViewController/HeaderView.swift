@@ -8,10 +8,14 @@
 
 import UIKit
 
+protocol HeaderViewDelegate: AnyObject {
+    func headerViewDidEndTimer()
+}
+
 final class HeaderView: UICollectionReusableView {
     
     enum State {
-        case loaded(title: String, description: String)
+        case loaded(title: String, description: String, isTimerEnabled: Bool)
         case loading
         case error(title: String, description: String)
     }
@@ -19,6 +23,12 @@ final class HeaderView: UICollectionReusableView {
     static var identifier: String {
         return String(describing: self)
     }
+    
+    // MARK: - Properties
+    weak var delegate: HeaderViewDelegate?
+    private var timer = Timer()
+    private var secondsLeft: Int = 5
+    private let totalSeconds: Int = 5
     
     // MARK: - Header Views
     
@@ -35,7 +45,7 @@ final class HeaderView: UICollectionReusableView {
         let l = UILabel()
         l.translatesAutoresizingMaskIntoConstraints = false
         l.textAlignment = .center
-        l.font = UIFont.boldSystemFont(ofSize: 20)
+        l.font = UIFont.boldSystemFont(ofSize: 16)
         l.textColor = .white
         l.numberOfLines = 0
         l.lineBreakMode = .byWordWrapping
@@ -59,6 +69,25 @@ final class HeaderView: UICollectionReusableView {
         let v = UIView()
         v.backgroundColor = Color.darkGray
         return v
+    }()
+    
+    private let timerContainerView: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.darkGray
+        v.layer.cornerRadius = 30
+        v.layer.shadowColor = Color.black.cgColor
+        v.layer.shadowOpacity = 0.7
+        v.layer.shadowOffset = .zero
+        v.layer.shadowRadius = 10
+        return v
+    }()
+    
+    private let timerLabel: UILabel = {
+        let l = UILabel()
+        l.text = "0"
+        l.textColor = Color.white
+        l.font = UIFont.boldSystemFont(ofSize: 20)
+        return l
     }()
     
     // MARK: - Skeleton views
@@ -94,32 +123,59 @@ final class HeaderView: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        timer.invalidate()
+    }
+    
     // MARK: - Public functions
     
     func setup(state: State) {
         switch state {
-        case .loaded(let title, let description):
+        case .loaded(let title, let description, let isTimerEnabled):
             titleLabel.text = title
             descriptionLabel.text = description
             setLabels(hidden: false)
             setSkeletons(hidden: true)
             shimmerSkeletons(false)
+            setTimer(hidden: !isTimerEnabled)
+            setupTimer()
         case .loading:
             titleLabel.text = ""
             descriptionLabel.text = ""
             setLabels(hidden: true)
             setSkeletons(hidden: false)
             shimmerSkeletons(false)
+            setTimer(hidden: true)
         case .error(let title, let description):
             titleLabel.text = title
             descriptionLabel.text = description
             setLabels(hidden: false)
             setSkeletons(hidden: true)
             shimmerSkeletons(false)
+            setTimer(hidden: true)
         }
     }
     
     // MARK: - Private functions
+    
+    private func setupViews() {
+        backgroundColor = Color.black
+        
+        // Header subviews
+        addSubview(titleLabel)
+        addSubview(descriptionLabel)
+        addSubview(quizImageView)
+        addSubview(bottomSpacingView)
+        
+        // Skeleton subviews
+        addSubview(titleLabelSkeleton)
+        addSubview(descriptionLabelSkeleton)
+        addSubview(descriptionLabel2Skeleton)
+        
+        // Timer subviews
+        addSubview(timerContainerView)
+        timerContainerView.addSubview(timerLabel)
+    }
     
     private func setupAnchor() {
         // MARK: Header anchors
@@ -139,7 +195,6 @@ final class HeaderView: UICollectionReusableView {
         quizImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
         quizImageView.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         
-        // MARK: BottomSpacingView anchor
         bottomSpacingView.anchor(height: 16)
         bottomSpacingView.anchor(leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor)
         
@@ -160,26 +215,37 @@ final class HeaderView: UICollectionReusableView {
                                          trailing: descriptionLabelSkeleton.trailingAnchor,
                                          insets: .init(top: 12, left: 37, bottom: 0, right: 37))
         
+        // MARK: Timer anchors
+        timerContainerView.anchor(height: 60, width: 60)
+        timerContainerView.anchor(bottom: bottomAnchor,
+                                  trailing: trailingAnchor,
+                                  insets: .init(top: 0, left: 0, bottom: 20, right: 15))
+        
+        timerLabel.anchorCenterSuperview()
     }
     
-    private func setupViews() {
-        backgroundColor = Color.black
-        
-        // Header subviews
-        addSubview(titleLabel)
-        addSubview(descriptionLabel)
-        addSubview(quizImageView)
-        addSubview(bottomSpacingView)
-        
-        // Skeleton subviews
-        addSubview(titleLabelSkeleton)
-        addSubview(descriptionLabelSkeleton)
-        addSubview(descriptionLabel2Skeleton)
+    func setupTimer() {
+        timer.invalidate()
+        secondsLeft = totalSeconds
+        timerLabel.text = "\(secondsLeft)"
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { timer in
+            if self.secondsLeft == 0 {
+                self.delegate?.headerViewDidEndTimer()
+                timer.invalidate()
+                return
+            }
+            self.secondsLeft -= 1
+            self.timerLabel.text = "\(self.secondsLeft)"
+        })
     }
     
     private func setLabels(hidden: Bool) {
         titleLabel.isHidden = hidden
         descriptionLabel.isHidden = hidden
+    }
+    
+    private func setTimer(hidden: Bool) {
+        timerContainerView.isHidden = hidden
     }
     
     private func setSkeletons(hidden: Bool) {

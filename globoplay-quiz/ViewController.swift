@@ -21,12 +21,21 @@ final class ViewController: UIViewController {
     
     private var state: State = .loading {
         didSet {
+            switch state {
+            case .loaded:
+                footerView.setupButton(state: canShowNextButton ? .next : .hidden)
+            case .loading:
+                footerView.setupButton(state: .hidden)
+            case .error:
+                footerView.setupButton(state: .tryAgain)
+            }
             collectionView.reloadData()
             collectionView.collectionViewLayout.invalidateLayout()
         }
     }
     private let webservice = QuizWebservice()
     private var selectedQuestionIndex: Int?
+    private var timerEndedAndNoneSelected = false
     private var selectedChoiceIndex: Int?
     private var selectedChoiceId: String?
     private var questions: [Question] = [] {
@@ -39,7 +48,13 @@ final class ViewController: UIViewController {
     private var contentViewHeightMultipler: CGFloat {
         return 1.0 - headerViewHeightMultiplier - footerViewHeightMultiplier
     }
-
+    private var canShowNextButton: Bool {
+        return selectedChoiceId != nil || timerEndedAndNoneSelected
+    }
+    private var canSelectChoice: Bool {
+        return selectedChoiceId == nil && !timerEndedAndNoneSelected
+    }
+    
     
     // MARK: - Views
     
@@ -56,13 +71,13 @@ final class ViewController: UIViewController {
         return cv
     }()
     
-    private let footerView: UIView = {
+    private let footerView: FooterView = {
         let f = FooterView()
         f.translatesAutoresizingMaskIntoConstraints = false
         f.backgroundColor = Color.darkGray
         return f
     }()
-
+    
     
     // MARK: - Lifecycle
     
@@ -80,6 +95,7 @@ final class ViewController: UIViewController {
         selectedChoiceId = nil
         selectedQuestionIndex = nil
         selectedChoiceIndex = nil
+        timerEndedAndNoneSelected = false
         questions = []
         
         getQuestions()
@@ -89,7 +105,6 @@ final class ViewController: UIViewController {
     // MARK: - Private functions
     
     private func registerCells() {
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "UICollectionViewCell")
         collectionView.register(ChoiceCell.self, forCellWithReuseIdentifier: ChoiceCell.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
     }
@@ -98,7 +113,7 @@ final class ViewController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(footerView)
     }
- 
+    
     private func setupConstraints() {
         // MARK: - CollectionView Anchor
         collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
@@ -153,21 +168,28 @@ extension ViewController: UICollectionViewDataSource {
         if state == .loading {
             cellState = .loading
         } else {
-            guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
-            let question = questions[selectedQuestionIndex]
-            let choice = question.choices[indexPath.item]
-            
-            if let selectedChoiceIndex = selectedChoiceIndex {
-                let isCorrect = question.correctAnswer == choice.id
-                let isSelectedCell = indexPath.item == selectedChoiceIndex
+            if let selectedQuestionIndex = selectedQuestionIndex {
+                let question = questions[selectedQuestionIndex]
+                let choice = question.choices[indexPath.item]
                 
-                if isCorrect {
-                    cellState = isSelectedCell ? .correct(text: choice.answer) : .correctNotSelected(text: choice.answer)
+                if timerEndedAndNoneSelected {
+                    cellState = .timerEndedAndNoneSelected(text: choice.answer)
                 } else {
-                    cellState = isSelectedCell ? .wrong(text: choice.answer) : .wrongNotSelected(text: choice.answer)
+                    if let selectedChoiceIndex = selectedChoiceIndex {
+                        let isCorrect = question.correctAnswer == choice.id
+                        let isSelectedCell = indexPath.item == selectedChoiceIndex
+                        
+                        if isCorrect {
+                            cellState = isSelectedCell ? .correct(text: choice.answer) : .correctNotSelected(text: choice.answer)
+                        } else {
+                            cellState = isSelectedCell ? .wrong(text: choice.answer) : .wrongNotSelected(text: choice.answer)
+                        }
+                    } else {
+                        cellState = .unselected(text: choice.answer)
+                    }
                 }
             } else {
-                cellState = .unselected(text: choice.answer)
+                cellState = .loading
             }
         }
         
@@ -184,13 +206,13 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let selectedQuestionIndex = selectedQuestionIndex else { return }
+        guard canSelectChoice else { return }
         let question = questions[selectedQuestionIndex]
         let choice = question.choices[indexPath.item]
         selectedChoiceIndex = indexPath.item
         selectedChoiceId = choice.id
-        (footerView as? FooterView)?.setupButton(state: .next)
         
-        collectionView.reloadData()
+        state = .loaded
     }
 }
 
@@ -199,24 +221,23 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = collectionView.dequeueReusableSupplementaryView(
-                    ofKind: UICollectionView.elementKindSectionHeader,
-                    withReuseIdentifier: HeaderView.identifier,
-                    for: indexPath
-                ) as! HeaderView
+            let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
+                                                                         withReuseIdentifier: HeaderView.identifier,
+                                                                         for: indexPath) as! HeaderView
+            header.delegate = self
             
             switch state {
             case .loaded:
                 if let selectedQuestionIndex = selectedQuestionIndex {
                     let question = questions[selectedQuestionIndex]
-                    let state: HeaderView.State = .error(title: "Questão \(selectedQuestionIndex+1)", description: question.description)
+                    let isTimerEnabled: Bool = selectedChoiceId == nil && !timerEndedAndNoneSelected
+                    let state: HeaderView.State = .loaded(title: "Questão \(selectedQuestionIndex+1)", description: question.description, isTimerEnabled: isTimerEnabled)
                     header.setup(state: state)
                 }
             case .loading:
                 header.setup(state: .loading)
             case .error:
                 let state: HeaderView.State = .error(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
-                (footerView as? FooterView)?.setupButton(state: .tryAgain)
                 header.setup(state: state)
             }
             
@@ -231,8 +252,9 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
-final class Cell: UICollectionViewCell {
-    static var identifier: String {
-        return String(describing: self)
+extension ViewController: HeaderViewDelegate {
+    func headerViewDidEndTimer() {
+        timerEndedAndNoneSelected = true
+        state = .loaded
     }
 }
