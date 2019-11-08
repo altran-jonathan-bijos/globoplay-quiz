@@ -8,6 +8,10 @@
 
 import UIKit
 
+protocol FooterViewDelegate: AnyObject {
+    func footerViewDidTapButton()
+}
+
 final class FooterView: UIView {
     
     enum State {
@@ -15,6 +19,8 @@ final class FooterView: UIView {
         case next
         case hidden
     }
+    
+    weak var delegate: FooterViewDelegate?
     
     private let footerImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: "footer-wave"))
@@ -24,7 +30,7 @@ final class FooterView: UIView {
         return imageView
     }()
     
-    private let nextButton: UIButton = {
+    private lazy var nextButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.contentEdgeInsets = .init(top: 0, left: 38, bottom: 0, right: 38)
@@ -32,6 +38,7 @@ final class FooterView: UIView {
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20.0)
         button.layer.cornerRadius = 25
         button.backgroundColor = Color.black
+        button.addTarget(self, action: #selector(didTapButton), for: .touchUpInside)
         return button
     }()
     
@@ -71,5 +78,9 @@ final class FooterView: UIView {
         self.nextButton.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         self.nextButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16).isActive = true
         self.nextButton.heightAnchor.constraint(equalToConstant: 51).isActive = true
+    }
+    
+    @objc private func didTapButton() {
+        delegate?.footerViewDidTapButton()
     }
 }

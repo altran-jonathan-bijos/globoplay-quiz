@@ -229,7 +229,7 @@ final class HeaderView: UICollectionReusableView {
         secondsLeft = totalSeconds
         timerLabel.text = "\(secondsLeft)"
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true, block: { timer in
-            if self.secondsLeft == 0 {
+            if self.secondsLeft == 1 {
                 self.delegate?.headerViewDidEndTimer()
                 timer.invalidate()
                 return

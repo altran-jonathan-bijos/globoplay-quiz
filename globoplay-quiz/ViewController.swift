@@ -43,6 +43,7 @@ final class ViewController: UIViewController {
             selectedQuestionIndex = questions.count > 0 ? 0 : nil
         }
     }
+    private var answers: [Answer] = []
     private let headerViewHeightMultiplier: CGFloat = 0.3873239437
     private let footerViewHeightMultiplier: CGFloat = 0.09375
     private var contentViewHeightMultipler: CGFloat {
@@ -54,6 +55,19 @@ final class ViewController: UIViewController {
     private var canSelectChoice: Bool {
         return selectedChoiceId == nil && !timerEndedAndNoneSelected
     }
+    private var isFinished: Bool {
+        guard let selectedQuestionIndex = selectedQuestionIndex else {
+            return false
+        }
+        return questions.endIndex == selectedQuestionIndex
+    }
+//    private var isChoiceCorrect: Bool {
+//        guard let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex, let selectedChoiceId = selectedChoiceId else {
+//            return false
+//        }
+//        let question = questions[selectedQuestionIndex]
+//        return question.correctAnswer == selectedChoiceId
+//    }
     
     
     // MARK: - Views
@@ -71,10 +85,11 @@ final class ViewController: UIViewController {
         return cv
     }()
     
-    private let footerView: FooterView = {
+    private lazy var footerView: FooterView = {
         let f = FooterView()
         f.translatesAutoresizingMaskIntoConstraints = false
         f.backgroundColor = Color.darkGray
+        f.delegate = self
         return f
     }()
     
@@ -92,8 +107,8 @@ final class ViewController: UIViewController {
     }
     
     @objc private func reload() {
-        selectedChoiceId = nil
         selectedQuestionIndex = nil
+        selectedChoiceId = nil
         selectedChoiceIndex = nil
         timerEndedAndNoneSelected = false
         questions = []
@@ -106,6 +121,7 @@ final class ViewController: UIViewController {
     
     private func registerCells() {
         collectionView.register(ChoiceCell.self, forCellWithReuseIdentifier: ChoiceCell.identifier)
+        collectionView.register(ResultCell.self, forCellWithReuseIdentifier: ResultCell.identifier)
         collectionView.register(HeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderView.identifier)
     }
     
@@ -137,11 +153,19 @@ final class ViewController: UIViewController {
             case .success(let questions):
                 self.state = .loaded
                 Quiz.questions = questions
-                self.questions = Quiz.random(total: 3)
+                self.questions = Quiz.random(total: 2)
             case .failure:
                 self.state = .error
             }
         }
+    }
+    
+    private func goToNextQuestion() {
+        selectedChoiceId = nil
+        selectedChoiceIndex = nil
+        timerEndedAndNoneSelected = false
+        
+        state = .loaded
     }
 }
 
@@ -149,7 +173,7 @@ extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch state {
         case .loaded:
-            guard let selectedQuestionIndex = selectedQuestionIndex else {
+            guard let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex else {
                 return 0
             }
             let question = questions[selectedQuestionIndex]
@@ -162,13 +186,18 @@ extension ViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if isFinished {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ResultCell.identifier, for: indexPath) as! ResultCell
+            return cell
+        }
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChoiceCell.identifier, for: indexPath) as! ChoiceCell
         
         let cellState: ChoiceCell.State
         if state == .loading {
             cellState = .loading
         } else {
-            if let selectedQuestionIndex = selectedQuestionIndex {
+            if let selectedQuestionIndex = selectedQuestionIndex, !isFinished {
                 let question = questions[selectedQuestionIndex]
                 let choice = question.choices[indexPath.item]
                 
@@ -189,6 +218,7 @@ extension ViewController: UICollectionViewDataSource {
                     }
                 }
             } else {
+                #warning("Missing state")
                 cellState = .loading
             }
         }
@@ -205,12 +235,14 @@ extension ViewController: UICollectionViewDataSource {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let selectedQuestionIndex = selectedQuestionIndex else { return }
+        guard let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex else { return }
         guard canSelectChoice else { return }
         let question = questions[selectedQuestionIndex]
         let choice = question.choices[indexPath.item]
         selectedChoiceIndex = indexPath.item
         selectedChoiceId = choice.id
+        
+        answers.append(Answer(questionId: selectedQuestionIndex, choiceId: choice.id))
         
         state = .loaded
     }
@@ -228,10 +260,9 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
             
             switch state {
             case .loaded:
-                if let selectedQuestionIndex = selectedQuestionIndex {
+                if let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex {
                     let question = questions[selectedQuestionIndex]
-                    let isTimerEnabled: Bool = selectedChoiceId == nil && !timerEndedAndNoneSelected
-                    let state: HeaderView.State = .loaded(title: "Questão \(selectedQuestionIndex+1)", description: question.description, isTimerEnabled: isTimerEnabled)
+                    let state: HeaderView.State = .loaded(title: "Questão \(selectedQuestionIndex+1)", description: question.description, isTimerEnabled: canSelectChoice)
                     header.setup(state: state)
                 }
             case .loading:
@@ -256,5 +287,14 @@ extension ViewController: HeaderViewDelegate {
     func headerViewDidEndTimer() {
         timerEndedAndNoneSelected = true
         state = .loaded
+    }
+}
+
+extension ViewController: FooterViewDelegate {
+    func footerViewDidTapButton() {
+        if let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex {
+            self.selectedQuestionIndex = selectedQuestionIndex + 1
+            goToNextQuestion()
+        }
     }
 }
