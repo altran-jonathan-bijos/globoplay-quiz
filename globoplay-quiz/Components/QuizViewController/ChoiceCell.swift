@@ -16,13 +16,15 @@ final class ChoiceCell: UICollectionViewCell {
     }
     
     enum State {
-        case unselected
-        case correct
-        case correctNotSelected
-        case wrong
-        case wrongNotSelected
+        case unselected(text: String)
+        case correct(text: String)
+        case correctNotSelected(text: String)
+        case wrong(text: String)
+        case wrongNotSelected(text: String)
+        case loading
     }
     
+    // MARK: - Cell views
     private let containerView: UIView = {
         let v = UIView()
         v.backgroundColor = Color.white
@@ -38,11 +40,20 @@ final class ChoiceCell: UICollectionViewCell {
         return lbl
     }()
     
+    // MARK: - Loading views
+    private let labelSkeleton: UIView = {
+        let v = UIView()
+        v.backgroundColor = Color.darkGray
+        v.layer.cornerRadius = 2
+        return v
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         contentView.addSubview(containerView)
         containerView.addSubview(label)
+        containerView.addSubview(labelSkeleton)
         
         containerView.anchor(top: contentView.topAnchor,
                              leading: contentView.leadingAnchor,
@@ -50,6 +61,9 @@ final class ChoiceCell: UICollectionViewCell {
                              trailing: contentView.trailingAnchor,
                              insets: .init(top: 0, left: 14, bottom: 0, right: 14))
         label.fillSuperview()
+        
+        labelSkeleton.anchor(height: 8, width: 145)
+        labelSkeleton.anchorCenterSuperview()
     }
     
     required init?(coder: NSCoder) {
@@ -62,43 +76,68 @@ final class ChoiceCell: UICollectionViewCell {
         }
     }
     
-    func setup(text: String, state: ChoiceCell.State) {
-        label.text = text
-        
-        let textColor: UIColor
+    func setup(state: ChoiceCell.State) {
         let color: UIColor
         let borderWidth: CGFloat
         let borderColor: UIColor?
         switch state {
-        case .unselected:
-            textColor = Color.black
+        case .unselected(let text):
+            label.text = text
+            label.textColor = Color.black
             color = Color.white
             borderWidth = 0
             borderColor = nil
-        case .correct:
-            textColor = Color.white
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .correct(let text):
+            label.text = text
+            label.textColor = Color.white
             color = Color.green
             borderWidth = 0
             borderColor = nil
-        case .correctNotSelected:
-            textColor = Color.green
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .correctNotSelected(let text):
+            label.text = text
+            label.textColor = Color.green
             color = .clear
             borderWidth = 2
             borderColor = Color.green
-        case .wrong:
-            textColor = Color.white
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .wrong(let text):
+            label.text = text
+            label.textColor = Color.white
             color = Color.red
             borderWidth = 0
             borderColor = nil
-        case .wrongNotSelected:
-            textColor = Color.lightGray
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .wrongNotSelected(let text):
+            label.text = text
+            label.textColor = Color.lightGray
             color = .clear
             borderWidth = 2
             borderColor = Color.lightGray
+            setLabel(hidden: false)
+            setSkeleton(hidden: true)
+        case .loading:
+            color = Color.white
+            borderWidth = 0
+            borderColor = nil
+            setLabel(hidden: true)
+            setSkeleton(hidden: false)
         }
-        label.textColor = textColor
         containerView.backgroundColor = color
         containerView.layer.borderWidth = borderWidth
         containerView.layer.borderColor = borderColor?.cgColor
+    }
+    
+    private func setLabel(hidden: Bool) {
+        label.isHidden = hidden
+    }
+    
+    private func setSkeleton(hidden: Bool) {
+        labelSkeleton.isHidden = hidden
     }
 }

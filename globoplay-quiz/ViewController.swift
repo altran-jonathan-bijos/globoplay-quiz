@@ -139,43 +139,54 @@ final class ViewController: UIViewController {
 
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let selectedQuestionIndex = selectedQuestionIndex else {
-            return 0
+        switch state {
+        case .loaded:
+            guard let selectedQuestionIndex = selectedQuestionIndex else {
+                return 0
+            }
+            let question = questions[selectedQuestionIndex]
+            return question.choices.count
+        case .loading:
+            return 4
+        case .error:
+            return 1
         }
-        let question = questions[selectedQuestionIndex]
-        return question.choices.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
-        let question = questions[selectedQuestionIndex]
-        let choice = question.choices[indexPath.item]
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChoiceCell.identifier, for: indexPath) as! ChoiceCell
         
         let cellState: ChoiceCell.State
-        if let selectedChoiceIndex = selectedChoiceIndex {
-            let isCorrect = question.correctAnswer == choice.id
-            let isSelectedCell = indexPath.item == selectedChoiceIndex
+        if state == .loading {
+            cellState = .loading
+        } else {
+            guard let selectedQuestionIndex = selectedQuestionIndex else { return UICollectionViewCell() }
+            let question = questions[selectedQuestionIndex]
+            let choice = question.choices[indexPath.item]
             
-            if isCorrect {
-                if isSelectedCell {
-                    cellState = .correct
+            if let selectedChoiceIndex = selectedChoiceIndex {
+                let isCorrect = question.correctAnswer == choice.id
+                let isSelectedCell = indexPath.item == selectedChoiceIndex
+                
+                if isCorrect {
+                    if isSelectedCell {
+                        cellState = .correct(text: choice.answer)
+                    } else {
+                        cellState = .correctNotSelected(text: choice.answer)
+                    }
                 } else {
-                    cellState = .correctNotSelected
+                    if isSelectedCell {
+                        cellState = .wrong(text: choice.answer)
+                    } else {
+                        cellState = .wrongNotSelected(text: choice.answer)
+                    }
                 }
             } else {
-                if isSelectedCell {
-                    cellState = .wrong
-                } else {
-                    cellState = .wrongNotSelected
-                }
+                cellState = .unselected(text: choice.answer)
             }
-        } else {
-            cellState = .unselected
         }
         
-        cell.setup(text: choice.answer, state: cellState)
+        cell.setup(state: cellState)
         
         return cell
     }
