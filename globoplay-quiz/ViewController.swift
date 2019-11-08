@@ -21,13 +21,6 @@ final class ViewController: UIViewController {
     
     private var state: State = .loading {
         didSet {
-//            switch state {
-//            case .loaded:
-//
-//            case .loading:
-//
-//            case .error:
-//            }
             collectionView.reloadData()
             collectionView.collectionViewLayout.invalidateLayout()
         }
@@ -169,17 +162,9 @@ extension ViewController: UICollectionViewDataSource {
                 let isSelectedCell = indexPath.item == selectedChoiceIndex
                 
                 if isCorrect {
-                    if isSelectedCell {
-                        cellState = .correct(text: choice.answer)
-                    } else {
-                        cellState = .correctNotSelected(text: choice.answer)
-                    }
+                    cellState = isSelectedCell ? .correct(text: choice.answer) : .correctNotSelected(text: choice.answer)
                 } else {
-                    if isSelectedCell {
-                        cellState = .wrong(text: choice.answer)
-                    } else {
-                        cellState = .wrongNotSelected(text: choice.answer)
-                    }
+                    cellState = isSelectedCell ? .wrong(text: choice.answer) : .wrongNotSelected(text: choice.answer)
                 }
             } else {
                 cellState = .unselected(text: choice.answer)
@@ -203,6 +188,7 @@ extension ViewController: UICollectionViewDelegate {
         let choice = question.choices[indexPath.item]
         selectedChoiceIndex = indexPath.item
         selectedChoiceId = choice.id
+        (footerView as? FooterView)?.setupButton(state: .next)
         
         collectionView.reloadData()
     }
@@ -213,9 +199,11 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         switch kind {
         case UICollectionView.elementKindSectionHeader:
-            let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
-                                                                         withReuseIdentifier: HeaderView.identifier,
-                                                                         for: indexPath) as! HeaderView
+            let header = collectionView.dequeueReusableSupplementaryView(
+                    ofKind: UICollectionView.elementKindSectionHeader,
+                    withReuseIdentifier: HeaderView.identifier,
+                    for: indexPath
+                ) as! HeaderView
             
             switch state {
             case .loaded:
@@ -228,9 +216,9 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
                 header.setup(state: .loading)
             case .error:
                 let state: HeaderView.State = .error(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
+                (footerView as? FooterView)?.setupButton(state: .tryAgain)
                 header.setup(state: state)
             }
-            
             
             return header
         default:
