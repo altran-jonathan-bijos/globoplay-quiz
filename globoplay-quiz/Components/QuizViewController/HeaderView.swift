@@ -138,7 +138,10 @@ final class HeaderView: UICollectionReusableView {
             setSkeletons(hidden: true)
             shimmerSkeletons(false)
             setTimer(hidden: !isTimerEnabled)
-            setupTimer()
+            timer.invalidate()
+            if isTimerEnabled {
+                setupTimer()
+            }
         case .loading:
             titleLabel.text = ""
             descriptionLabel.text = ""

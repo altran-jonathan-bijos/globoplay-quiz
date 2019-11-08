@@ -14,6 +14,7 @@ final class ViewController: UIViewController {
         case loaded
         case loading
         case error
+        case finished
     }
     
     
@@ -28,6 +29,8 @@ final class ViewController: UIViewController {
                 footerView.setupButton(state: .hidden)
             case .error:
                 footerView.setupButton(state: .tryAgain)
+            case .finished:
+                footerView.setupButton(state: .restart)
             }
             collectionView.reloadData()
             collectionView.collectionViewLayout.invalidateLayout()
@@ -61,13 +64,15 @@ final class ViewController: UIViewController {
         }
         return questions.endIndex == selectedQuestionIndex
     }
-//    private var isChoiceCorrect: Bool {
-//        guard let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex, let selectedChoiceId = selectedChoiceId else {
-//            return false
-//        }
-//        let question = questions[selectedQuestionIndex]
-//        return question.correctAnswer == selectedChoiceId
-//    }
+    private var answersProgress: Float {
+        let booleanAnswers = answers.map { (answer) -> Bool in
+            guard let question = questions.enumerated().first(where: { $0.offset == answer.questionId }) else { return false }
+            return answer.choiceId == question.element.correctAnswer
+        }
+        let correctAnswers = booleanAnswers.filter({ $0 == true })
+        let progress = Float(correctAnswers.count)/Float(questions.count)
+        return progress
+    }
     
     
     // MARK: - Views
@@ -77,7 +82,6 @@ final class ViewController: UIViewController {
         flowLayout.minimumLineSpacing = 24
         flowLayout.scrollDirection = .vertical
         let cv = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        cv.contentInset = .init(top: 0, left: 0, bottom: self.view.frame.height * self.footerViewHeightMultiplier, right: 0)
         cv.delegate = self
         cv.dataSource = self
         cv.translatesAutoresizingMaskIntoConstraints = false
@@ -112,6 +116,7 @@ final class ViewController: UIViewController {
         selectedChoiceIndex = nil
         timerEndedAndNoneSelected = false
         questions = []
+        answers = []
         
         getQuestions()
     }
@@ -153,7 +158,7 @@ final class ViewController: UIViewController {
             case .success(let questions):
                 self.state = .loaded
                 Quiz.questions = questions
-                self.questions = Quiz.random(total: 2)
+                self.questions = Quiz.random(total: 5)
             case .failure:
                 self.state = .error
             }
@@ -165,7 +170,11 @@ final class ViewController: UIViewController {
         selectedChoiceIndex = nil
         timerEndedAndNoneSelected = false
         
-        state = .loaded
+        if isFinished {
+            state = .finished
+        } else {
+            state = .loaded
+        }
     }
 }
 
@@ -180,25 +189,22 @@ extension ViewController: UICollectionViewDataSource {
             return question.choices.count
         case .loading:
             return 4
-        case .error:
+        case .error, .finished:
             return 1
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if isFinished {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ResultCell.identifier, for: indexPath) as! ResultCell
-            return cell
-        }
-        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ChoiceCell.identifier, for: indexPath) as! ChoiceCell
         
         let cellState: ChoiceCell.State
-        if state == .loading {
+        
+        switch state {
+        case .loading:
             cellState = .loading
-        } else if state == .error {
+        case .error:
             cellState = .error
-        } else {
+        case .loaded:
             if let selectedQuestionIndex = selectedQuestionIndex, !isFinished {
                 let question = questions[selectedQuestionIndex]
                 let choice = question.choices[indexPath.item]
@@ -223,6 +229,8 @@ extension ViewController: UICollectionViewDataSource {
                 #warning("Missing state")
                 cellState = .loading
             }
+        case .finished:
+            cellState = .finished(progress: answersProgress)
         }
         
         cell.setup(state: cellState)
@@ -234,7 +242,7 @@ extension ViewController: UICollectionViewDataSource {
         switch state {
         case .loaded, .loading:
             return CGSize(width: view.frame.width, height: 45)
-        case .error:
+        case .error, .finished:
             return CGSize(width: view.frame.width, height: view.frame.height * contentViewHeightMultipler)
         }
     }
@@ -277,6 +285,33 @@ extension ViewController: UICollectionViewDelegateFlowLayout {
             case .error:
                 let state: HeaderView.State = .error(title: "Ops...", description: "Tivemos um problema ao carregar as informações.")
                 header.setup(state: state)
+            case .finished:
+                let title: String
+                let description: String
+                switch answersProgress {
+                case 0..<0.25:
+                    title = "Não foi dessa vez"
+                    description = "Quem acredita sempre alcança"
+                case 0.25..<0.5:
+                    title = "Vish..."
+                    description = "Precisa estudar mais ein"
+                case 0.5..<0.75:
+                    title = "Quase lá!"
+                    description = "Viver na média as vezez é bom né"
+                case 0.75..<1.0:
+                    title = "Mandou bem!"
+                    description = "Digamos que você está acima da média. No pain no gain!"
+                case 1.0:
+                    title = "Você é o cara!"
+                    description = "Acertar tudo é só pra quem realmente sabe! Parabéns!"
+                default:
+                    title = ""
+                    description = ""
+                }
+                
+                // Get percentage text
+                let state: HeaderView.State = .loaded(title: title, description: description, isTimerEnabled: false)
+                header.setup(state: state)
             }
             
             return header
@@ -299,6 +334,10 @@ extension ViewController: HeaderViewDelegate {
 
 extension ViewController: FooterViewDelegate {
     func footerViewDidTapButton() {
+        if isFinished {
+            reload()
+            return
+        }
         if let selectedQuestionIndex = selectedQuestionIndex, selectedQuestionIndex < questions.endIndex {
             self.selectedQuestionIndex = selectedQuestionIndex + 1
             goToNextQuestion()

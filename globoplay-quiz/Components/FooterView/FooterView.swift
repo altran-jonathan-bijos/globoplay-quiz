@@ -18,6 +18,7 @@ final class FooterView: UIView {
         case tryAgain
         case next
         case hidden
+        case restart
     }
     
     weak var delegate: FooterViewDelegate?
@@ -63,6 +64,9 @@ final class FooterView: UIView {
             nextButton.isHidden = true
         case .tryAgain:
             nextButton.setTitle("Tentar Novamente", for: .normal)
+            nextButton.isHidden = false
+        case .restart:
+            nextButton.setTitle("Recomeçar", for: .normal)
             nextButton.isHidden = false
         }
     }

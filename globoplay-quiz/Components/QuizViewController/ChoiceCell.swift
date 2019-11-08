@@ -24,6 +24,7 @@ final class ChoiceCell: UICollectionViewCell {
         case timerEndedAndNoneSelected(text: String)
         case loading
         case error
+        case finished(progress: Float)
     }
     
     // MARK: - Cell views
@@ -42,6 +43,7 @@ final class ChoiceCell: UICollectionViewCell {
         return lbl
     }()
     
+    // MARK: - Error views
     private let imageError: UIImageView = {
         let i = UIImageView(image: UIImage(named: "warning"))
         i.backgroundColor = Color.darkGray
@@ -57,6 +59,25 @@ final class ChoiceCell: UICollectionViewCell {
         return v
     }()
     
+    // MARK: - Finished views
+    private let finishedLabel: UILabel = {
+        let l = UILabel()
+        l.text = "0%"
+        l.textColor = Color.white
+        l.textAlignment = .center
+        l.font = UIFont.boldSystemFont(ofSize: 30)
+        return l
+    }()
+    
+    private let finishedProgressView: UIProgressView = {
+        let pv = UIProgressView(progressViewStyle: UIProgressView.Style.default)
+        pv.progressTintColor = Color.red
+        pv.trackTintColor = Color.lightGray
+        pv.progress = 0
+        pv.layer.cornerRadius = 4
+        return pv
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -64,6 +85,8 @@ final class ChoiceCell: UICollectionViewCell {
         containerView.addSubview(label)
         containerView.addSubview(labelSkeleton)
         containerView.addSubview(imageError)
+        containerView.addSubview(finishedLabel)
+        containerView.addSubview(finishedProgressView)
         
         setupConstraints()
     }
@@ -92,6 +115,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .correct(let text):
             label.text = text
             label.textColor = Color.white
@@ -101,6 +125,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .correctNotSelected(let text):
             label.text = text
             label.textColor = Color.green
@@ -110,6 +135,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .wrong(let text):
             label.text = text
             label.textColor = Color.white
@@ -119,6 +145,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .wrongNotSelected(let text):
             label.text = text
             label.textColor = Color.lightGray
@@ -128,6 +155,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .timerEndedAndNoneSelected(let text):
             label.text = text
             label.textColor = Color.lightGray
@@ -136,6 +164,7 @@ final class ChoiceCell: UICollectionViewCell {
             borderColor = Color.lightGray
             setLabel(hidden: false)
             setSkeleton(hidden: true)
+            setFinished(hidden: true)
         case .loading:
             color = Color.white
             borderWidth = 0
@@ -143,6 +172,7 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: true)
             setLabel(hidden: true)
             setSkeleton(hidden: false)
+            setFinished(hidden: true)
         case .error:
             borderColor = nil
             borderWidth = 0
@@ -150,7 +180,18 @@ final class ChoiceCell: UICollectionViewCell {
             setImageError(hidden: false)
             setLabel(hidden: true)
             setSkeleton(hidden: true)
-            break
+            setFinished(hidden: true)
+        case .finished(let progress):
+            borderColor = nil
+            borderWidth = 0
+            color = Color.darkGray
+            setImageError(hidden: true)
+            setLabel(hidden: true)
+            setSkeleton(hidden: true)
+            setFinished(hidden: false)
+            
+            finishedLabel.text = "\(Int(progress*100))%"
+            finishedProgressView.progress = progress
         }
         containerView.backgroundColor = color
         containerView.layer.borderWidth = borderWidth
@@ -169,6 +210,11 @@ final class ChoiceCell: UICollectionViewCell {
         imageError.isHidden = hidden
     }
     
+    private func setFinished(hidden: Bool) {
+        finishedLabel.isHidden = hidden
+        finishedProgressView.isHidden = hidden
+    }
+    
     private func setupConstraints() {
         containerView.anchor(top: contentView.topAnchor,
                              leading: contentView.leadingAnchor,
@@ -180,7 +226,15 @@ final class ChoiceCell: UICollectionViewCell {
         imageError.anchor(height: 141, width: 141)
         imageError.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 60).isActive = true
         imageError.anchorCenterXToSuperview()
+        
         labelSkeleton.anchor(height: 8, width: 145)
         labelSkeleton.anchorCenterSuperview()
+        
+        finishedLabel.anchorCenterYToSuperview(constant: -20)
+        finishedLabel.anchorCenterXToSuperview()
+        
+        finishedProgressView.anchorCenterYToSuperview(constant: 10)
+        finishedProgressView.anchorCenterXToSuperview()
+        finishedProgressView.anchor(height: 8, width: 180)
     }
 }
