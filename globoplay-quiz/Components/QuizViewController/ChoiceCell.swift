@@ -22,6 +22,7 @@ final class ChoiceCell: UICollectionViewCell {
         case wrong(text: String)
         case wrongNotSelected(text: String)
         case loading
+        case error
     }
     
     // MARK: - Cell views
@@ -40,6 +41,13 @@ final class ChoiceCell: UICollectionViewCell {
         return lbl
     }()
     
+    private let imageError: UIImageView = {
+        let i = UIImageView(image: UIImage(named: "warning"))
+        i.backgroundColor = Color.darkGray
+        i.contentMode = .scaleAspectFit
+        return i
+    }()
+    
     // MARK: - Loading views
     private let labelSkeleton: UIView = {
         let v = UIView()
@@ -54,16 +62,9 @@ final class ChoiceCell: UICollectionViewCell {
         contentView.addSubview(containerView)
         containerView.addSubview(label)
         containerView.addSubview(labelSkeleton)
+        containerView.addSubview(imageError)
         
-        containerView.anchor(top: contentView.topAnchor,
-                             leading: contentView.leadingAnchor,
-                             bottom: contentView.bottomAnchor,
-                             trailing: contentView.trailingAnchor,
-                             insets: .init(top: 0, left: 14, bottom: 0, right: 14))
-        label.fillSuperview()
-        
-        labelSkeleton.anchor(height: 8, width: 145)
-        labelSkeleton.anchorCenterSuperview()
+        setupConstraints()
     }
     
     required init?(coder: NSCoder) {
@@ -87,6 +88,7 @@ final class ChoiceCell: UICollectionViewCell {
             color = Color.white
             borderWidth = 0
             borderColor = nil
+            setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .correct(let text):
@@ -95,6 +97,7 @@ final class ChoiceCell: UICollectionViewCell {
             color = Color.green
             borderWidth = 0
             borderColor = nil
+            setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .correctNotSelected(let text):
@@ -103,6 +106,7 @@ final class ChoiceCell: UICollectionViewCell {
             color = .clear
             borderWidth = 2
             borderColor = Color.green
+            setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .wrong(let text):
@@ -111,6 +115,7 @@ final class ChoiceCell: UICollectionViewCell {
             color = Color.red
             borderWidth = 0
             borderColor = nil
+            setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .wrongNotSelected(let text):
@@ -119,14 +124,24 @@ final class ChoiceCell: UICollectionViewCell {
             color = .clear
             borderWidth = 2
             borderColor = Color.lightGray
+            setImageError(hidden: true)
             setLabel(hidden: false)
             setSkeleton(hidden: true)
         case .loading:
             color = Color.white
             borderWidth = 0
             borderColor = nil
+            setImageError(hidden: true)
             setLabel(hidden: true)
             setSkeleton(hidden: false)
+        case .error:
+            borderColor = nil
+            borderWidth = 0
+            color = Color.darkGray
+            setImageError(hidden: false)
+            setLabel(hidden: true)
+            setSkeleton(hidden: true)
+            break
         }
         containerView.backgroundColor = color
         containerView.layer.borderWidth = borderWidth
@@ -139,5 +154,24 @@ final class ChoiceCell: UICollectionViewCell {
     
     private func setSkeleton(hidden: Bool) {
         labelSkeleton.isHidden = hidden
+    }
+    
+    private func setImageError(hidden: Bool) {
+        imageError.isHidden = hidden
+    }
+    
+    private func setupConstraints() {
+        containerView.anchor(top: contentView.topAnchor,
+                             leading: contentView.leadingAnchor,
+                             bottom: contentView.bottomAnchor,
+                             trailing: contentView.trailingAnchor,
+                             insets: .init(top: 0, left: 14, bottom: 0, right: 14))
+        label.fillSuperview()
+        
+        imageError.anchor(height: 141, width: 141)
+        imageError.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 60).isActive = true
+        imageError.anchorCenterXToSuperview()
+        labelSkeleton.anchor(height: 8, width: 145)
+        labelSkeleton.anchorCenterSuperview()
     }
 }
