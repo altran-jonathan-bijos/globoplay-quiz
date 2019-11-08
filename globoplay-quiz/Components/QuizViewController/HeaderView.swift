@@ -81,33 +81,32 @@ final class HeaderView: UICollectionReusableView {
     
     func setupViews() {
         backgroundColor = Color.black
+        
+        // Header subviews
         addSubview(titleLabel)
-        addSubview(titleLabelSkeleton)
         addSubview(descriptionLabel)
-        addSubview(descriptionLabelSkeleton)
-        addSubview(descriptionLabel2Skeleton)
         addSubview(quizImageView)
         addSubview(bottomSpacingView)
+        
+        // Skeleton subviews
+        addSubview(descriptionLabelSkeleton)
+        addSubview(descriptionLabel2Skeleton)
+        addSubview(titleLabelSkeleton)
     }
     
     private func setupAnchor() {
-        // MARK: Skeleton anchors
-        
-        
-        // MARK: titleLabel anchor
+        // MARK: Header anchors
         titleLabel.anchor(top: topAnchor,
                           leading: leadingAnchor,
                           bottom: descriptionLabel.topAnchor,
                           trailing: trailingAnchor,
                           insets: .init(top: 32, left: 32, bottom: 18, right: 32))
         
-        // MARK: descriptionLabel anchor
         descriptionLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 16).isActive = true
         descriptionLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -16).isActive = true
         
-        // MARK: quizImageView anchor
-        let percent: CGFloat = 0.2363636364
-        quizImageView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: percent).isActive = true
+        let quizImageViewHeightMultiplier: CGFloat = 0.2363636364
+        quizImageView.heightAnchor.constraint(equalTo: self.heightAnchor, multiplier: quizImageViewHeightMultiplier).isActive = true
         quizImageView.topAnchor.constraint(greaterThanOrEqualTo: descriptionLabel.bottomAnchor, constant: 18).isActive = true
         quizImageView.bottomAnchor.constraint(equalTo: self.bottomSpacingView.topAnchor).isActive = true
         quizImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
@@ -116,6 +115,13 @@ final class HeaderView: UICollectionReusableView {
         // MARK: BottomSpacingView anchor
         bottomSpacingView.anchor(height: 16)
         bottomSpacingView.anchor(leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor)
+        
+        // MARK: Skeleton anchors
+        titleLabelSkeleton.anchor(height: 11, width: 141)
+        titleLabelSkeleton.anchorCenterXToSuperview()
+        titleLabelSkeleton.anchor(top: topAnchor, insets: .init(top: 46, left: 0, bottom: 0, right: 0))
+        
+//        descriptionLabelSkeleton.anchor(top: <#T##NSLayoutYAxisAnchor?#>, leading: <#T##NSLayoutXAxisAnchor?#>, bottom: <#T##NSLayoutYAxisAnchor?#>, trailing: <#T##NSLayoutXAxisAnchor?#>, insets: .init(top: 35, left: 16, bottom: 0, right: 16))
     }
     
     func setup(title: String, description: String) {

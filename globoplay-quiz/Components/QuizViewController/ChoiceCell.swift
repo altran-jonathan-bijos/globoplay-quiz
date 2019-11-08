@@ -56,6 +56,12 @@ final class ChoiceCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            contentView.alpha = isHighlighted ? 0.5 : 1
+        }
+    }
+    
     func setup(text: String, state: ChoiceCell.State) {
         label.text = text
         
