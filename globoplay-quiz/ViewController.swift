@@ -196,6 +196,8 @@ extension ViewController: UICollectionViewDataSource {
         let cellState: ChoiceCell.State
         if state == .loading {
             cellState = .loading
+        } else if state == .error {
+            cellState = .error
         } else {
             if let selectedQuestionIndex = selectedQuestionIndex, !isFinished {
                 let question = questions[selectedQuestionIndex]
@@ -229,7 +231,12 @@ extension ViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 45)
+        switch state {
+        case .loaded, .loading:
+            return CGSize(width: view.frame.width, height: 45)
+        case .error:
+            return CGSize(width: view.frame.width, height: view.frame.height * contentViewHeightMultipler)
+        }
     }
 }
 
