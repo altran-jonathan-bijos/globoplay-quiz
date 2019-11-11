@@ -27,8 +27,8 @@ final class HeaderView: UICollectionReusableView {
     // MARK: - Properties
     weak var delegate: HeaderViewDelegate?
     private var timer = Timer()
-    private var secondsLeft: Int = 5
-    private let totalSeconds: Int = 5
+    private var secondsLeft: Int = 30
+    private let totalSeconds: Int = 30
     
     // MARK: - Header Views
     
